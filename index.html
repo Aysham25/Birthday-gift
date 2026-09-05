@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy Birthday 🎂</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle at center, #24104f, #09001c 70%);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    #fireworks {
+      z-index: 1;
+    }
+
+    #confetti {
+      z-index: 3;
+    }
+
+    .card {
+      position: relative;
+      z-index: 2;
+      width: 90%;
+      max-width: 600px;
+      padding: 45px 25px;
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.10);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 0 50px rgba(190, 100, 255, 0.35);
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .emoji {
+      font-size: 65px;
+      animation: bounce 1.5s infinite;
+    }
+
+    h1 {
+      margin: 15px 0;
+      font-size: clamp(38px, 10vw, 70px);
+      background: linear-gradient(90deg, #ff77e9, #fff, #75eaff);
+      -webkit-background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 25px rgba(255,255,255,0.3);
+    }
+
+    h2 {
+      font-size: clamp(22px, 6vw, 34px);
+      margin-bottom: 18px;
+    }
+
+    p {
+      font-size: clamp(16px, 4vw, 21px);
+      line-height: 1.7;
+      color: #eee;
+    }
+
+    .cake {
+      font-size: 55px;
+      margin-top: 20px;
+      animation: glow 1.5s infinite alternate;
+    }
+
+    button {
+      margin-top: 25px;
+      padding: 13px 25px;
+      border: none;
+      border-radius: 30px;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #32104f;
+      background: white;
+      box-shadow: 0 0 20px rgba(255,255,255,0.5);
+      transition: 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 35px rgba(255,255,255,0.8);
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    @keyframes glow {
+      from { filter: drop-shadow(0 0 5px #ff69e8); }
+      to { filter: drop-shadow(0 0 25px #ff69e8); }
+    }
+
+    @media (max-width: 500px) {
+      .card {
+        padding: 35px 18px;
+        border-radius: 25px;
+      }
+
+      .emoji {
+        font-size: 50px;
+      }
+
+      .cake {
+        font-size: 45px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <canvas id="fireworks"></canvas>
+  <canvas id="confetti"></canvas>
+
+  <div class="card">
+    <div class="emoji">🎉</div>
+
+    <!-- CHANGE THE NAME HERE -->
+    <h1>Happy Birthday!</h1>
+
+    <h2>🎂 To Someone Amazing 🎂</h2>
+
+    <!-- CHANGE YOUR MESSAGE HERE -->
+    <p>
+      Wishing you a day filled with happiness, laughter,
+      beautiful memories and lots of love! 💖
+      <br>
+      May all your wishes come true! ✨
+    </p>
+
+    <div class="cake">🎂✨🎈</div>
+
+    <button onclick="celebrate()">🎊 Celebrate! 🎊</button>
+  </div>
+
+  <script>
+    // =========================
+    // CONFETTI
+    // =========================
+
+    const confettiCanvas = document.getElementById("confetti");
+    const ctx = confettiCanvas.getContext("2d");
+
+    let confetti = [];
+
+    function resize() {
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+    }
+
+    window.addEventListener("resize", resize);
+    resize();
+
+    function createConfetti(amount = 180) {
+      for (let i = 0; i < amount; i++) {
+        confetti.push({
+          x: Math.random() * confettiCanvas.width,
+          y: Math.random() * -confettiCanvas.height,
+          size: Math.random() * 8 + 4,
+          speed: Math.random() * 3 + 2,
+          angle: Math.random() * Math.PI * 2,
+          rotation: Math.random() * 0.2 - 0.1,
+          color: [
+            "#ff4fd8",
+            "#ffd166",
+            "#5ee7ff",
+            "#ffffff",
+            "#9b5cff",
+            "#ff6b6b"
+          ][Math.floor(Math.random() * 6)]
+        });
+      }
+    }
+
+    function drawConfetti() {
+      ctx.clearRect(
+        0,
+        0,
+        confettiCanvas.width,
+        confettiCanvas.height
+      );
+
+      confetti.forEach((c, index) => {
+        c.y += c.speed;
+        c.angle += c.rotation;
+
+        if (c.y > confettiCanvas.height + 20) {
+          confetti.splice(index, 1);
+        }
+
+        ctx.save();
+        ctx.translate(c.x, c.y);
+        ctx.rotate(c.angle);
+
+        ctx.fillStyle = c.color;
+        ctx.fillRect(
+          -c.size / 2,
+          -c.size / 2,
+          c.size,
+          c.size * 1.8
+        );
+
+        ctx.restore();
+      });
+
+      requestAnimationFrame(drawConfetti);
+    }
+
+    createConfetti();
+    drawConfetti();
+
+
+    // =========================
+    // FIREWORKS
+    // =========================
+
+    const fireworksCanvas = document.getElementById("fireworks");
+    const fw = fireworksCanvas.getContext("2d");
+
+    let fireworks = [];
+    let particles = [];
+
+    function resizeFireworks() {
+      fireworksCanvas.width = window.innerWidth;
+      fireworksCanvas.height = window.innerHeight;
+    }
+
+    window.addEventListener("resize", resizeFireworks);
+    resizeFireworks();
+
+    function createFirework() {
+      fireworks.push({
+        x: Math.random() * fireworksCanvas.width,
+        y: fireworksCanvas.height,
+        targetX: Math.random() * fireworksCanvas.width,
+        targetY: Math.random() * fireworksCanvas.height * 0.55 + 50,
+        speed: 7
+      });
+    }
+
+    function explode(x, y) {
+      const colors = [
+        "#ff4fd8",
+        "#ffd166",
+        "#5ee7ff",
+        "#ffffff",
+        "#9b5cff"
+      ];
+
+      const color = colors[Math.floor(Math.random() * colors.length)];
+
+      for (let i = 0; i < 70; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 5 + 2;
+
+        particles.push({
+          x: x,
+          y: y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          life: 100,
+          color: color
+        });
+      }
+    }
+
+    function animateFireworks() {
+      fw.fillStyle = "rgba(9, 0, 28, 0.2)";
+      fw.fillRect(
+        0,
+        0,
+        fireworksCanvas.width,
+        fireworksCanvas.height
+      );
+
+      fireworks.forEach((f, index) => {
+        f.x += (f.targetX - f.x) * 0.04;
+        f.y += (f.targetY - f.y) * 0.04;
+
+        fw.beginPath();
+        fw.arc(f.x, f.y, 3, 0, Math.PI * 2);
+        fw.fillStyle = "white";
+        fw.fill();
+
+        if (Math.abs(f.y - f.targetY) < 10) {
+          explode(f.x, f.y);
+          fireworks.splice(index, 1);
+        }
+      });
+
+      particles.forEach((p, index) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.05;
+        p.life--;
+
+        fw.globalAlpha = p.life / 100;
+        fw.beginPath();
+        fw.arc(p.x, p.y, 2, 0, Math.PI * 2);
+        fw.fillStyle = p.color;
+        fw.fill();
+
+        if (p.life <= 0) {
+          particles.splice(index, 1);
+        }
+      });
+
+      fw.globalAlpha = 1;
+
+      requestAnimationFrame(animateFireworks);
+    }
+
+    animateFireworks();
+
+
+    // =========================
+    // CELEBRATE BUTTON
+    // =========================
+
+    function celebrate() {
+      createConfetti(250);
+
+      for (let i = 0; i < 8; i++) {
+        setTimeout(createFirework, i * 250);
+      }
+    }
+
+    // Automatic fireworks
+    setInterval(createFirework, 1200);
+
+    // Start with a celebration
+    setTimeout(celebrate, 500);
+  </script>
+
+</body>
+</html>
